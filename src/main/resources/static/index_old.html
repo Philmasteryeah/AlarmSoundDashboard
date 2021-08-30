@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiosk</title>
+<link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+</head>
+<body>
+    <div class="container">
+        <h1>Result Web</h1>
+        <table class="table table-bordered">
+            <tr>
+                <th>Priority</th>
+                <th>Created</th>
+                <th>Description</th>
+            </tr>
+            <tr id="reloadme" th:each="order : ${orders}">
+                <td><span class="badge bg-success">Success</span></td>
+                <td th:text="${order?.description}"></td>
+                <td th:text="${order?.priority}"></td>
+                <td th:text="${order?.id}">id</td>
+            </tr>
+        </table>
+    </div>
+    <div class="container">
+        <a id="reload" th:href="@{/}" class="btn btn-primary">Reload</a>
+        <form name='f' th:action="@{/add}" th:object="${oder}" method='POST'>
+            <a th:href="@{/add}" th:action="@{/add}" class="btn btn-primary">add</a>
+        </form>
+        <a th:href="@{/delete}" th:action="@{/delete}" class="btn btn-primary">delete</a>
+    </div>
+    </div>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript">
+					var interval = setInterval(function() {
+						//location.reload();
+
+						document.getElementById("reload").click();
+
+						console.log("reload");
+
+					}, 3000);
+
+					//clearInterval(interval);
+				</script>
+</body>
+</html>

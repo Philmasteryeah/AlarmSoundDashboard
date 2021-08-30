@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiosk</title>
+<link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.min.css" />
+</head>
+<body>
+
+    <div class="container">
+        <h1>Kiosk Dashboard</h1>
+        <table id="lstOrders" class="table table-striped" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Id</th>
+                    <th>Priority</th>
+                    <th>Description</th>
+                    <th>Created</th>
+                    <th>Confirmed</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <hr title="Admin Zone" />
+
+    <div class="container">
+        <a id="btnReload" href="/" class="btn btn-primary">Reload</a>
+        <button id="btnOrderAdd" onclick="$.get('api/add')" class="btn btn-primary">add</button>
+        <button id="btnOrderDelete" onclick="$.get('api/delete')" class="btn btn-primary">
+            delete
+            </a>
+    </div>
+    </br>
+    <script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/datatables/js/jquery.dataTables.js"></script>
+
+    <!-- SOUND -->
+
+    <audio id="multiaudio1" src="../audio/flute_c_long_01.wav" preload="auto"></audio>
+    <audio id="multiaudio2" src="/audio/piano_chord.wav" preload="auto"></audio>
+    <audio id="multiaudio3" src="/audio/synth_vox.wav" preload="auto"></audio>
+    <audio id="multiaudio4" src="/audio/shimmer.wav" preload="auto"></audio>
+    <audio id="multiaudio5" src="/audio/sweep.wav" preload="auto"></audio>
+
+    <div class="container">
+        <a href="javascript:play_multi_sound('multiaudio1');" class="btn btn-primary">Flute</a>
+        <a href="javascript:play_multi_sound('multiaudio2');" class="btn btn-primary">Piano Chord</a>
+        <a href="javascript:play_multi_sound('multiaudio3');" class="btn btn-primary">Synth Vox</a>
+        <a href="javascript:play_multi_sound('multiaudio4');" class="btn btn-primary">Shimmer</a>
+        <a href="javascript:play_multi_sound('multiaudio5');" class="btn btn-primary">Sweep</a>
+    </div>
+    <script type="text/javascript">
+    // Multichannel Javascript Sound
+					var channel_max = 10; // number of channels
+					audiochannels = new Array();
+					for (a = 0; a < channel_max; a++) { // prepare the channels
+						audiochannels[a] = new Array();
+						audiochannels[a]['channel'] = new Audio(); // create a new audio object
+						audiochannels[a]['finished'] = -1; // expected end time for this channel
+					}
+					function play_multi_sound(s) {
+						for (a = 0; a < audiochannels.length; a++) {
+							thistime = new Date();
+							if (audiochannels[a]['finished'] < thistime
+									.getTime()) { // is this channel finished?
+								audiochannels[a]['finished'] = thistime
+										.getTime()
+										+ document.getElementById(s).duration
+										* 1000;
+								audiochannels[a]['channel'].src = document
+										.getElementById(s).src;
+								audiochannels[a]['channel'].load();
+								audiochannels[a]['channel'].play();
+								break;
+							}
+						}
+					}
+				</script>
+    <!-- SOUND -->
+    <script type="text/javascript">
+					$(function() {
+
+						$("#lstOrders").DataTable({
+							searching: false,
+							paging: false,
+							info : false,
+							
+							ajax : {
+								url : "/api/orders",
+								dataSrc : "",
+
+							},
+							columns : [
+								{
+								data : "hexColor",
+							},{
+								data : "uuid",
+							}, {
+								data : "priority",
+							}, {
+								data : "description",
+							}, {
+								data : "stampCreated",
+							}, {
+								data : "stampConfirmed",
+							}],
+							columnDefs:
+					            [{
+					                "targets": 0,
+					                "data": 'hexColor',
+					                "render": function (data, type, row, meta) {
+					                    return '<div class="alert" style="background-color:' + data + '"/>';
+					                }
+					            },
+					            {
+					                "targets": 5,
+					                "data": 'stampConfirmed',
+					                "render": function (data, type, row, meta) {
+								       	if(data != null)
+					                		return data;
+					                    return ' <a id="btnConfirm" href="http://'+location.host+'/api/orders/'+row.uuid+'/confirm\" class="btn btn-primary">Confirm</a>'; // html escape item
+					                }
+					            },
+					            
+					            ],
+							
+
+						});
+
+						function playSound(){
+							play_multi_sound('multiaudio1');
+						}
+						
+						function reloadTable() {
+							var datatable = $("#lstOrders").DataTable();
+							datatable.ajax.reload(function() {
+								//console.log("datatable.ajax.reload");
+							}, false);
+							
+							
+							var data = datatable.rows().data();
+							 data.each(function (value, index) {
+								if(value.priority == 0 && value.stampConfirmed == null){
+								     playSound();
+							 	}
+							 });
+						}
+
+						$('#btnOrderAdd, #btnOrderDelete').click(function() {
+							reloadTable();
+						});
+
+						var interval = setInterval(function() {
+							reloadTable(); // automagically
+							console.log("reload");
+						}, 3000);
+						
+						//clearInterval(interval);
+						
+					});
+				</script>
+</body>
+</html>
