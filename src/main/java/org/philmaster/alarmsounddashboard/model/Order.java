@@ -95,11 +95,12 @@ public class Order {
 	public Order(String desc) {
 		this();
 		description = desc;
+		stampCreated = LocalDateTime.now();
 	}
 
-	public Order(String desc, String created) {
+	public Order(String desc, LocalDateTime created) {
 		this(desc);
-		stampCreated = LocalDateTime.parse(created);
+		stampCreated = created;
 	}
 
 //	private long randomId() {

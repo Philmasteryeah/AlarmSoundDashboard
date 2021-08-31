@@ -6,162 +6,199 @@
 <title>Kiosk</title>
 <link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.min.css" />
 </head>
-<body>
+<body onload="startTime()">
+	<header class="navbar navbar-expand-md navbar-dark bg-dark">
+		<div class="container">
+			<h1 class="navbar-brand">Kiosk Dashboard</h1>
+			<div class="navbar-brand" id="clock">00:00</div>
+		</div>
+	</header>
+	<main class="flex-shrink-0">
+		<div style="background: red;">
+			<div style="background: white; height: 100px;" id="alert"></div>
+		</div>
+		<div class="container">
+			<table id="lstOrders" class="table table-hover table-striped">
+				<thead>
+					<tr>
+						<th style="width: 1%">Priority</th>
+						<th style="width: 10%">Created</th>
+						<th style="width: 80%">Description</th>
+						<th style="width: 10%">Location</th>
+						<th style="width: 10%">Confirmed</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</main>
+	<footer class="footer mt-auto fixed-bottom py-3 bg-light">
+		<div class="container">
+			<h5>Admin Panel</h5>
+			<a id="btnReload" href="/" class="btn btn-primary">Reload</a>
+			<button id="btnOrderAdd" onclick="$.get('api/add')" class="btn btn-primary">add</button>
+			<button id="btnOrderDelete" onclick="$.get('api/delete')" class="btn btn-primary">delete</button>
+			|
+			<a href="javascript:play_multi_sound('multiaudio1');" class="btn btn-primary">Flute</a>
+			<a href="javascript:play_multi_sound('multiaudio2');" class="btn btn-primary">Piano Chord</a>
+			<a href="javascript:play_multi_sound('multiaudio3');" class="btn btn-primary">Synth Vox</a>
+			<a href="javascript:play_multi_sound('multiaudio4');" class="btn btn-primary">Shimmer</a>
+			<a href="javascript:play_multi_sound('multiaudio5');" class="btn btn-primary">Sweep</a>
+		</div>
+	</footer>
+	<audio id="multiaudio1" src="/audio/flute_c_long_01.wav" preload="auto"></audio>
+	<audio id="multiaudio2" src="/audio/piano_chord.wav" preload="auto"></audio>
+	<audio id="multiaudio3" src="/audio/synth_vox.wav" preload="auto"></audio>
+	<audio id="multiaudio4" src="/audio/shimmer.wav" preload="auto"></audio>
+	<audio id="multiaudio5" src="/audio/sweep.wav" preload="auto"></audio>
 
-    <div class="container">
-        <h1>Kiosk Dashboard</h1>
-        <table id="lstOrders" class="table table-striped" style="width: 100%">
-            <thead>
-                <tr>
-                    <th>Status</th>
-                    <th>Id</th>
-                    <th>Priority</th>
-                    <th>Description</th>
-                    <th>Created</th>
-                    <th>Confirmed</th>
-                </tr>
-            </thead>
-        </table>
-    </div>
+	<script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/webjars/jquery/jquery.min.js"></script>
+	<script src="/webjars/datatables/js/jquery.dataTables.js"></script>
 
-    <hr title="Admin Zone" />
+	<!-- SOUND -->
+	<script type="text/javascript">
+		// Multichannel Javascript Sound
+		var channel_max = 10; // number of channels
+		audiochannels = new Array();
+		for (a = 0; a < channel_max; a++) { // prepare the channels
+			audiochannels[a] = new Array();
+			audiochannels[a]['channel'] = new Audio(); // create a new audio object
+			audiochannels[a]['finished'] = -1; // expected end time for this channel
+		}
 
-    <div class="container">
-        <a id="btnReload" href="/" class="btn btn-primary">Reload</a>
-        <button id="btnOrderAdd" onclick="$.get('api/add')" class="btn btn-primary">add</button>
-        <button id="btnOrderDelete" onclick="$.get('api/delete')" class="btn btn-primary">
-            delete
-            </a>
-    </div>
-    </br>
-    <script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/webjars/jquery/jquery.min.js"></script>
-    <script src="/webjars/datatables/js/jquery.dataTables.js"></script>
+		function play_multi_sound(s) {
+			for (a = 0; a < audiochannels.length; a++) {
+				thistime = new Date();
+				if (audiochannels[a]['finished'] < thistime.getTime()) { // is this channel finished?
+					audiochannels[a]['finished'] = thistime.getTime()
+							+ document.getElementById(s).duration * 1000;
+					audiochannels[a]['channel'].src = document
+							.getElementById(s).src;
+					audiochannels[a]['channel'].load();
+					audiochannels[a]['channel'].play();
+					break;
+				}
+			}
+		}
+	</script>
+	<!-- SOUND -->
+	<script type="text/javascript">
+		function startTime() {
+			const today = new Date();
+			let h = today.getHours();
+			let m = today.getMinutes();
+			let s = today.getSeconds();
+			h = checkTime(h);
+			m = checkTime(m);
+			s = checkTime(s);
+			document.getElementById('clock').innerHTML = h + ":" + m + ":" + s;
+			setTimeout(startTime, 1000);
+		}
 
-    <!-- SOUND -->
+		function checkTime(i) {
+			if (i < 10) {
+				i = "0" + i
+			}; // add zero in front of numbers < 10
+			return i;
+		}
 
-    <audio id="multiaudio1" src="/audio/flute_c_long_01.wav" preload="auto"></audio>
-    <audio id="multiaudio2" src="/audio/piano_chord.wav" preload="auto"></audio>
-    <audio id="multiaudio3" src="/audio/synth_vox.wav" preload="auto"></audio>
-    <audio id="multiaudio4" src="/audio/shimmer.wav" preload="auto"></audio>
-    <audio id="multiaudio5" src="/audio/sweep.wav" preload="auto"></audio>
+		function playSound() {
+			play_multi_sound('multiaudio1');
+		}
 
-    <div class="container">
-        <a href="javascript:play_multi_sound('multiaudio1');" class="btn btn-primary">Flute</a>
-        <a href="javascript:play_multi_sound('multiaudio2');" class="btn btn-primary">Piano Chord</a>
-        <a href="javascript:play_multi_sound('multiaudio3');" class="btn btn-primary">Synth Vox</a>
-        <a href="javascript:play_multi_sound('multiaudio4');" class="btn btn-primary">Shimmer</a>
-        <a href="javascript:play_multi_sound('multiaudio5');" class="btn btn-primary">Sweep</a>
-    </div>
-    <script type="text/javascript">
-    // Multichannel Javascript Sound
-					var channel_max = 10; // number of channels
-					audiochannels = new Array();
-					for (a = 0; a < channel_max; a++) { // prepare the channels
-						audiochannels[a] = new Array();
-						audiochannels[a]['channel'] = new Audio(); // create a new audio object
-						audiochannels[a]['finished'] = -1; // expected end time for this channel
-					}
-					function play_multi_sound(s) {
-						for (a = 0; a < audiochannels.length; a++) {
-							thistime = new Date();
-							if (audiochannels[a]['finished'] < thistime
-									.getTime()) { // is this channel finished?
-								audiochannels[a]['finished'] = thistime
-										.getTime()
-										+ document.getElementById(s).duration
-										* 1000;
-								audiochannels[a]['channel'].src = document
-										.getElementById(s).src;
-								audiochannels[a]['channel'].load();
-								audiochannels[a]['channel'].play();
-								break;
-							}
-						}
-					}
-				</script>
-    <!-- SOUND -->
-    <script type="text/javascript">
-					$(function() {
+		function reloadTable() {
+			var datatable = $("#lstOrders").DataTable();
 
-						$("#lstOrders").DataTable({
-							searching: false,
-							paging: false,
-							info : false,
-							
-							ajax : {
-								url : "/api/orders",
-								dataSrc : "",
+			datatable.ajax.reload(function() {
+				//console.log("datatable.ajax.reload");
+			}, false);
 
-							},
-							columns : [
-								{
-								data : "hexColor",
-							},{
-								data : "uuid",
-							}, {
-								data : "priority",
-							}, {
-								data : "description",
-							}, {
-								data : "stampCreated",
-							}, {
-								data : "stampConfirmed",
-							}],
-							columnDefs:
-					            [{
-					                "targets": 0,
-					                "data": 'hexColor',
-					                "render": function (data, type, row, meta) {
-					                    return '<div class="alert" style="background-color:' + data + '"/>';
-					                }
-					            },
-					            {
-					                "targets": 5,
-					                "data": 'stampConfirmed',
-					                "render": function (data, type, row, meta) {
-								       	if(data != null)
-					                		return data;
-					                    return ' <a id="btnConfirm" href="http://'+location.host+'/api/orders/'+row.uuid+'/confirm\" class="btn btn-primary">Confirm</a>'; // html escape item
-					                }
-					            },
-					            
-					            ],
-							
+			var data = datatable.rows().data();
+			data.each(function(value, index) {
+				//
 
-						});
+				if (value.priority == 0 && value.stampConfirmed == null) {
+					playSound();
 
-						function playSound(){
-							play_multi_sound('multiaudio1');
-						}
-						
-						function reloadTable() {
-							var datatable = $("#lstOrders").DataTable();
-							datatable.ajax.reload(function() {
-								//console.log("datatable.ajax.reload");
-							}, false);
-							
-							
-							var data = datatable.rows().data();
-							 data.each(function (value, index) {
-								if(value.priority == 0 && value.stampConfirmed == null){
-								     playSound();
-							 	}
-							 });
-						}
+					console.log($(value));
 
-						$('#btnOrderAdd, #btnOrderDelete').click(function() {
-							reloadTable();
-						});
-
-						var interval = setInterval(function() {
-							reloadTable(); // automagically
-							console.log("reload");
-						}, 3000);
-						
-						//clearInterval(interval);
-						
+					$('#alert').fadeTo(100, 0.3, function() {
+						$(this).fadeTo(500, 1.0);
 					});
-				</script>
+
+				}
+			});
+		}
+
+		$(function() {
+
+			$("#lstOrders")
+					.DataTable(
+							{
+								searching : false,
+								paging : false,
+								info : false,
+
+								ajax : {
+									url : "/api/orders",
+									dataSrc : "",
+
+								},
+								columns : [{
+									data : "hexColor",
+								}, {
+									data : "stampCreated",
+								}, {
+									data : "description",
+								}, {
+									data : "stampConfirmed",
+								}],
+								columnDefs : [
+										{
+											"targets" : 0,
+											"data" : 'hexColor',
+											"render" : function(data, type,
+													row, meta) {
+												return '<div class="alert" style="background-color:' + data + '"/>';
+											}
+										},
+										{
+											"targets" : 1,
+											"data" : 'stampCreated',
+											"render" : function(data, type,
+													row, meta) {
+												if (data != null)
+													return data;
+												return ''; // TODO formatting
+											}
+										},
+										{
+											"targets" : 4,
+											"data" : 'stampConfirmed',
+											"render" : function(data, type,
+													row, meta) {
+												if (data != null)
+													return data;
+												return ' <a id="btnConfirm" href="http://'+location.host+'/api/orders/'+row.uuid+'/confirm\" class="btn btn-primary">Confirm</a>'; // html escape item
+											}
+										},
+
+								],
+
+							});
+
+			$('#btnOrderAdd, #btnOrderDelete').click(function() {
+				reloadTable();
+			});
+
+			var interval = setInterval(function() {
+				reloadTable(); // automagically
+				console.log("reload");
+			}, 3000);
+
+			//clearInterval(interval);
+
+		});
+	</script>
 </body>
 </html>

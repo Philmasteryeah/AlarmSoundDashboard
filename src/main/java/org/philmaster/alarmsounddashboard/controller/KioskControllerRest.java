@@ -45,7 +45,6 @@ public class KioskControllerRest {
 	@GetMapping(value = "/orders/{id}/confirm")
 	public void confirm(@PathVariable String id) {
 		Order order = service.findOneById(id);
-
 		if (order != null)
 			order.setStampConfirmed(LocalDateTime.now());
 

@@ -1,5 +1,6 @@
 package org.philmaster.alarmsounddashboard.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -23,13 +24,16 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	private void initTestList() {
-		repo.save(new Order("Kuchen"));
-		repo.save(new Order("Pizza"));
-		repo.save(new Order("Döner"));
-		repo.save(new Order("Kuchen"));
-		repo.save(new Order("Burger"));
-		repo.save(new Order("Cola"));
-		repo.save(new Order("Testz", "2021-01-01T01:01:00"));
+		repo.save(new Order("Kuchen", LocalDateTime.now()
+				.minusMinutes(2)));
+		repo.save(new Order("Pizza", LocalDateTime.now()
+				.minusMinutes(10)));
+		repo.save(new Order("Döner", LocalDateTime.now()
+				.minusMinutes(100)));
+		repo.save(new Order("Burger", LocalDateTime.now()
+				.minusMinutes(120)));
+		repo.save(new Order("Cola", LocalDateTime.now()
+				.minusMinutes(12)));
 		repo.flush();
 	}
 
@@ -50,12 +54,6 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<Order> findAll() {
-//		System.err.println("findall" + repo.count()
-//				.subscribe());
-//		Order order = new Order("Burger");
-//		order.setId(Long.MAX_VALUE);
-//		createOrder(order);
-//		repo.save(order);
 		return StreamSupport.stream(repo.findAll()
 				.spliterator(), false)
 				.collect(Collectors.toList());
@@ -75,11 +73,8 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Boolean addOneRandom() {
-
-		System.err.println("addOneRandomaddOneRandom");
 		try {
 			repo.save(new Order("Random"));
-			System.err.println("dd");
 			return Boolean.TRUE;
 		} catch (Exception e) {
 			System.out.println(e);
@@ -89,8 +84,8 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Boolean deleteOneRandom() {
-		// TODO
 		try {
+			repo.delete(findAll().get(0));
 			return Boolean.TRUE;
 		} catch (Exception e) {
 			System.out.println(e);
