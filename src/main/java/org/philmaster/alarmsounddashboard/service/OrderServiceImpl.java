@@ -2,6 +2,7 @@ package org.philmaster.alarmsounddashboard.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -10,6 +11,7 @@ import javax.annotation.PostConstruct;
 import org.philmaster.alarmsounddashboard.model.Order;
 import org.philmaster.alarmsounddashboard.repo.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 @Service("OrderService")
@@ -85,12 +87,31 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public Boolean deleteOneRandom() {
 		try {
-			repo.delete(findAll().get(0));
+			if (repo.count() > 0)
+				repo.delete(repo.findAll()
+						.get(0));
 			return Boolean.TRUE;
 		} catch (Exception e) {
 			System.out.println(e);
 			return Boolean.FALSE;
 		}
+	}
+
+	@Override
+	public Order findOneByUUID(String uuid) {
+		
+		
+		return repo.findAll()
+				.stream()
+				.filter(orr -> orr.uuid()
+						.equals(UUID.fromString(uuid)))
+				.findFirst()
+				.orElse(null);
+	}
+
+	@Override
+	public Order saveAndFlush(Order entity) {
+		return repo.saveAndFlush(entity);
 	}
 
 }

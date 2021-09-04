@@ -42,11 +42,12 @@ public class KioskControllerRest {
 		service.addOneRandom();
 	}
 
-	@GetMapping(value = "/orders/{id}/confirm")
-	public void confirm(@PathVariable String id) {
-		Order order = service.findOneById(id);
+	@GetMapping(value = "/orders/{uuid}/confirm")
+	public void confirm(@PathVariable String uuid) {
+		Order order = service.findOneByUUID(uuid);
 		if (order != null)
 			order.setStampConfirmed(LocalDateTime.now());
 
+		service.saveAndFlush(order);
 	}
 }

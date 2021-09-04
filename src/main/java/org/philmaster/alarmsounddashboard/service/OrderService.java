@@ -10,6 +10,8 @@ public interface OrderService {
 
 	Order findOneById(String id);
 
+	Order findOneByUUID(String uuid);
+
 	List<Order> findAll();
 
 	List<Order> findAllMaxOneDayBack();
@@ -17,5 +19,7 @@ public interface OrderService {
 	Boolean addOneRandom();
 
 	Boolean deleteOneRandom();
+
+	Order saveAndFlush(Order entity);
 
 }

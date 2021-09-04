@@ -50,7 +50,7 @@ public class Order {
 
 	@JsonGetter
 	public UUID uuid() {
-		return uuid;
+		return getUuid();
 	}
 
 	public Long getId() {
@@ -149,6 +149,18 @@ public class Order {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public UUID getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(UUID uuid) {
+		this.uuid = uuid;
+	}
+	
+	public void setUuid(String uuid) {
+		this.uuid = UUID.fromString(uuid);
 	}
 
 }
