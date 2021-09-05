@@ -36,6 +36,11 @@ public class KioskControllerRest {
 	public void delete(Model model) {
 		service.deleteOneRandom();
 	}
+	
+	@GetMapping(value = "/deleteAll")
+	public void deleteAll(Model model) {
+		service.deleteAll();
+	}
 
 	@GetMapping(value = "/add")
 	public void add(Model model) {
@@ -47,7 +52,6 @@ public class KioskControllerRest {
 		Order order = service.findOneByUUID(uuid);
 		if (order != null)
 			order.setStampConfirmed(LocalDateTime.now());
-
 		service.saveAndFlush(order);
 	}
 }

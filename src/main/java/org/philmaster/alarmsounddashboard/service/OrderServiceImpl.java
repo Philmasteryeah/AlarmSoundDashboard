@@ -36,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
 				.minusMinutes(120)));
 		repo.save(new Order("Cola", LocalDateTime.now()
 				.minusMinutes(12)));
-		repo.flush();
+
 	}
 
 	@Override
@@ -87,9 +87,8 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public Boolean deleteOneRandom() {
 		try {
-			if (repo.count() > 0)
-				repo.delete(repo.findAll()
-						.get(0));
+			if (!findAll().isEmpty())
+				repo.delete(findAll().get(0));
 			return Boolean.TRUE;
 		} catch (Exception e) {
 			System.out.println(e);
@@ -99,10 +98,8 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Order findOneByUUID(String uuid) {
-		
-		
-		return repo.findAll()
-				.stream()
+
+		return findAll().stream()
 				.filter(orr -> orr.uuid()
 						.equals(UUID.fromString(uuid)))
 				.findFirst()
@@ -111,7 +108,12 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Order saveAndFlush(Order entity) {
-		return repo.saveAndFlush(entity);
+		return repo.save(entity);
+	}
+
+	@Override
+	public void deleteAll() {
+		repo.deleteAll();
 	}
 
 }

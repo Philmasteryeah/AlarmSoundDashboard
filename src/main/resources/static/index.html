@@ -33,10 +33,13 @@
 	<footer class="footer mt-auto fixed-bottom py-3 bg-light">
 		<div class="container">
 			<h5>Admin Panel</h5>
-			<a id="btnReload" href="/" class="btn btn-primary">Reload</a>
-			<button id="btnOrderAdd" onclick="$.get('api/add')" class="btn btn-primary">add</button>
-			<button id="btnOrderDelete" onclick="$.get('api/delete')" class="btn btn-primary">delete</button>
-			|
+			<a id="btnReload" href="/" class="btn btn-primary">Reload Page</a>
+			<button id="btnOrderAdd" onclick="$.get('api/add')" class="btn btn-primary">add one</button>
+			<button id="btnOrderDelete" onclick="$.get('api/delete')" class="btn btn-primary">delete one</button>
+			<button id="btnOrderDelete" onclick="$.get('api/deleteAll')" class="btn btn-primary">delete all</button>
+		</div>
+		<div class="container">
+			<h5>Sound Board</h5>
 			<a href="javascript:play_multi_sound('multiaudio1');" class="btn btn-primary">Flute</a>
 			<a href="javascript:play_multi_sound('multiaudio2');" class="btn btn-primary">Piano Chord</a>
 			<a href="javascript:play_multi_sound('multiaudio3');" class="btn btn-primary">Synth Vox</a>
@@ -106,20 +109,19 @@
 		}
 
 		function isAlert(value) {
-			
 			return value.priority == 0 && value.stampConfirmed == null;
 		}
 
 		function makeAlert(value) {
 			if (isAlert(value)) {
 				playSound();
-
-				//console.log($(value));
-
-				$('#alert').fadeTo(100, 0.3, function() {
-					$(this).fadeTo(500, 1.0);
+			    // outer blinking
+				$('#alert').fadeTo(1000, 0.3, function() {
+					$(this).fadeTo(3000, 1.0,);
+					// inner blinking
+					$('#btnOrderConfirm').parent().css("background","red").css("opacity","0.9");
+					
 				});
-
 			}
 		}
 
@@ -174,9 +176,9 @@
 											"data" : 'stampCreated',
 											"render" : function(data, type,
 													row, meta) {
-												if (data != null)
-													return data;
-												return ''; // TODO formatting
+												return data != null ? data
+														.slice(11, 19) : '';
+
 											}
 										},
 										{
@@ -185,10 +187,12 @@
 											"render" : function(data, type,
 													row, meta) {
 												if (isAlert(row))
-													return '<a id="btnOrderAdd" href="/" onclick="$.get(\'/api/orders/'
+													return '<a id="btnOrderConfirm" href="/" onclick="$.get(\'/api/orders/'
 															+ row.uuid
 															+ '/confirm\')\" class="btn btn-primary">Confirm</a>'
-												return data;
+												//2021-09-05 23:01:19 ->  23:01:19
+												return data != null ? data
+														.slice(11, 19) : '';
 
 											}
 										},
@@ -197,7 +201,7 @@
 
 							});
 
-			$('#btnOrderAdd, #btnOrderDelete').click(function() {
+			$('button').click(function() {
 				reloadTable();
 			});
 
